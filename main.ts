@@ -102,9 +102,32 @@ class LissajousCurveTable {
             circle.render();
         }
         for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
+            context.lineWidth = CIRCLE_RADIUS / 20;
+            for (let j: number = 0; j < NUMBER_OF_CIRCLES; j += 1) {
+                const pointX: number = this.horizontalAxisCircles[j].pointX;
+                const pointY: number = this.verticalAxisCircles[i].pointY;
+                this.points[i][j].push({ x: pointX, y: pointY });
+                const averageHue: number = (this.horizontalAxisCircles[j].hue + this.verticalAxisCircles[i].hue) / 2;
+                context.strokeStyle = `hsl(${averageHue}, 100%, 75%)`;
+                for (let k: number = 0; k < this.points[i][j].length - 1; k += 1) {
+                    context.beginPath();
+                    context.moveTo(this.points[i][j][k].x, this.points[i][j][k].y);
+                    context.lineTo(this.points[i][j][k + 1].x, this.points[i][j][k + 1].y);
+                    context.stroke();
+                    if (this.points[i][j].length > 361) {
+                        this.points[i][j].shift();
+                    }
+                }
+                context.beginPath();
+                context.arc(
+                    this.horizontalAxisCircles[j].pointX, this.verticalAxisCircles[i].pointY,
+                    CIRCLE_RADIUS / 20, 0, Math.PI * 2,
+                );
+                context.fill();
+            }
             context.strokeStyle = "white";
             context.lineWidth = 1;
-            context.setLineDash([5, 5]);
+            context.setLineDash([CIRCLE_RADIUS / 10, CIRCLE_RADIUS / 10]);
             const horizontalAxisCircle: Circle = this.horizontalAxisCircles[i];
             context.beginPath();
             context.moveTo(horizontalAxisCircle.pointX, horizontalAxisCircle.pointY);
@@ -116,29 +139,6 @@ class LissajousCurveTable {
             context.lineTo(TABLE_LENGTH, verticalAxisCircle.pointY);
             context.stroke();
             context.setLineDash([]);
-            context.lineWidth = CIRCLE_RADIUS / 20;
-            for (let j: number = 0; j < NUMBER_OF_CIRCLES; j += 1) {
-                const pointX: number = this.horizontalAxisCircles[j].pointX;
-                const pointY: number = this.verticalAxisCircles[i].pointY;
-                context.beginPath();
-                context.arc(
-                    this.horizontalAxisCircles[j].pointX, this.verticalAxisCircles[i].pointY,
-                    CIRCLE_RADIUS / 20, 0, Math.PI * 2,
-                );
-                context.fill();
-                this.points[i][j].push({ x: pointX, y: pointY });
-                const averageHue: number = (this.horizontalAxisCircles[j].hue + this.verticalAxisCircles[i].hue) / 2;
-                context.strokeStyle = `hsl(${averageHue}, 100%, 75%)`;
-                for (let k: number = 0; k < this.points[i][j].length - 1; k += 1) {
-                    context.beginPath();
-                    context.moveTo(this.points[i][j][k].x, this.points[i][j][k].y);
-                    context.lineTo(this.points[i][j][k + 1].x, this.points[i][j][k + 1].y);
-                    context.stroke();
-                    if (this.points[i][j].length > 360) {
-                        this.points[i][j].shift();
-                    }
-                }
-            }
         }
     }
 
