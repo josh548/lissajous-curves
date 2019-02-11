@@ -1,6 +1,11 @@
 const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = window.innerWidth / window.devicePixelRatio;
+canvas.height = window.innerHeight / window.devicePixelRatio;
+
+const computedWidth: number = +getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
+const computedHeight: number = +getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
+canvas.setAttribute("width", `${computedWidth * window.devicePixelRatio}px`);
+canvas.setAttribute("height", `${computedHeight * window.devicePixelRatio}px`);
 
 const TABLE_LENGTH: number = Math.min(canvas.width, canvas.height);
 const PADDING: number = TABLE_LENGTH / 50;
