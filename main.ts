@@ -12,6 +12,8 @@ const PADDING: number = TABLE_LENGTH / 50;
 const NUMBER_OF_CIRCLES: number = 5;
 const CIRCLE_RADIUS: number = ((TABLE_LENGTH - (PADDING * (NUMBER_OF_CIRCLES + 2))) / (NUMBER_OF_CIRCLES + 1)) / 2;
 const BASE_ANGLE_INCREMENT: number = Math.PI / 180;
+const NUMBER_OF_SEGMENTS: number = 180;
+const ANGLE_INCREMENT_FACTOR: number = 360 / NUMBER_OF_SEGMENTS;
 
 const context: CanvasRenderingContext2D = canvas.getContext("2d")!;
 
@@ -65,7 +67,6 @@ class LissajousCurveTable {
     private readonly horizontalAxisCircles: Circle[] = [];
     private readonly verticalAxisCircles: Circle[] = [];
     private readonly circleHues: number[] = [];
-    private readonly points: Point[][][] = [];
 
     public constructor() {
         for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
@@ -91,12 +92,6 @@ class LissajousCurveTable {
                 ),
             );
         }
-        for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
-            this.points[i] = [];
-            for (let j: number = 0; j < NUMBER_OF_CIRCLES; j += 1) {
-                this.points[i][j] = [];
-            }
-        }
     }
 
     public render(): void {
@@ -109,20 +104,28 @@ class LissajousCurveTable {
         for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
             context.lineWidth = CIRCLE_RADIUS / 20;
             for (let j: number = 0; j < NUMBER_OF_CIRCLES; j += 1) {
-                const pointX: number = this.horizontalAxisCircles[j].pointX;
-                const pointY: number = this.verticalAxisCircles[i].pointY;
-                this.points[i][j].push({ x: pointX, y: pointY });
                 const averageHue: number = (this.horizontalAxisCircles[j].hue + this.verticalAxisCircles[i].hue) / 2;
                 context.strokeStyle = `hsl(${averageHue}, 100%, 75%)`;
-                for (let k: number = 0; k < this.points[i][j].length - 1; k += 1) {
+                const horizontalAxisCircle: Circle = this.horizontalAxisCircles[j];
+                const verticalAxisCircle: Circle = this.verticalAxisCircles[i];
+                let angleX: number = horizontalAxisCircle.currentAngle;
+                let angleY: number = verticalAxisCircle.currentAngle;
+                let lastX: number = horizontalAxisCircle.centerX + horizontalAxisCircle.radius * Math.cos(angleX);
+                let lastY: number = verticalAxisCircle.centerY + verticalAxisCircle.radius * Math.sin(angleY);
+                for (let k: number = NUMBER_OF_SEGMENTS + 1; k > 0; k -= 1) {
+                    context.globalAlpha = 1 - (k / NUMBER_OF_SEGMENTS);
+                    const nextX: number = horizontalAxisCircle.centerX + horizontalAxisCircle.radius * Math.cos(angleX);
+                    const nextY: number = verticalAxisCircle.centerY + verticalAxisCircle.radius * Math.sin(angleY);
                     context.beginPath();
-                    context.moveTo(this.points[i][j][k].x, this.points[i][j][k].y);
-                    context.lineTo(this.points[i][j][k + 1].x, this.points[i][j][k + 1].y);
+                    context.moveTo(lastX, lastY);
+                    context.lineTo(nextX, nextY);
                     context.stroke();
-                    if (this.points[i][j].length > 361) {
-                        this.points[i][j].shift();
-                    }
+                    lastX = nextX;
+                    lastY = nextY;
+                    angleX += horizontalAxisCircle.angleIncrement * ANGLE_INCREMENT_FACTOR;
+                    angleY += verticalAxisCircle.angleIncrement * ANGLE_INCREMENT_FACTOR;
                 }
+                context.globalAlpha = 1;
                 context.beginPath();
                 context.arc(
                     this.horizontalAxisCircles[j].pointX, this.verticalAxisCircles[i].pointY,
@@ -133,15 +136,13 @@ class LissajousCurveTable {
             context.strokeStyle = "white";
             context.lineWidth = 1;
             context.setLineDash([CIRCLE_RADIUS / 10, CIRCLE_RADIUS / 10]);
-            const horizontalAxisCircle: Circle = this.horizontalAxisCircles[i];
             context.beginPath();
-            context.moveTo(horizontalAxisCircle.pointX, horizontalAxisCircle.pointY);
-            context.lineTo(horizontalAxisCircle.pointX, TABLE_LENGTH);
+            context.moveTo(this.horizontalAxisCircles[i].pointX, this.horizontalAxisCircles[i].pointY);
+            context.lineTo(this.horizontalAxisCircles[i].pointX, TABLE_LENGTH);
             context.stroke();
-            const verticalAxisCircle: Circle = this.verticalAxisCircles[i];
             context.beginPath();
-            context.moveTo(verticalAxisCircle.pointX, verticalAxisCircle.pointY);
-            context.lineTo(TABLE_LENGTH, verticalAxisCircle.pointY);
+            context.moveTo(this.verticalAxisCircles[i].pointX, this.verticalAxisCircles[i].pointY);
+            context.lineTo(TABLE_LENGTH, this.verticalAxisCircles[i].pointY);
             context.stroke();
             context.setLineDash([]);
         }
