@@ -162,7 +162,8 @@ class LissajousCurveTable {
                 let lastX: number = horizontalAxisCircle.centerX + horizontalAxisCircle.radius * Math.cos(angleX);
                 let lastY: number = verticalAxisCircle.centerY + verticalAxisCircle.radius * Math.sin(angleY);
                 for (let k: number = NUMBER_OF_SEGMENTS + 1; k > 0; k -= 1) {
-                    context.globalAlpha = 1 - (k / NUMBER_OF_SEGMENTS);
+                    const special: number = (i + 1 + j + 1) / 4;
+                    context.globalAlpha = Math.max(0, 1 - ((k * special) / NUMBER_OF_SEGMENTS));
                     const nextX: number = horizontalAxisCircle.centerX + horizontalAxisCircle.radius * Math.cos(angleX);
                     const nextY: number = verticalAxisCircle.centerY + verticalAxisCircle.radius * Math.sin(angleY);
                     context.beginPath();
@@ -222,6 +223,8 @@ function animate(): void {
     if (angleIncrementedSoFar >= (Math.PI * 2.077)) {
         mediaRecorder.stop();
         setTimeout(download, 100);
+
+        return;
     }
     window.requestAnimationFrame(animate);
 }
