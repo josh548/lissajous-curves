@@ -11,6 +11,7 @@ const TABLE_LENGTH: number = Math.min(canvas.width, canvas.height);
 const PADDING: number = TABLE_LENGTH / 50;
 const NUMBER_OF_CIRCLES: number = 5;
 const CIRCLE_RADIUS: number = ((TABLE_LENGTH - (PADDING * (NUMBER_OF_CIRCLES + 2))) / (NUMBER_OF_CIRCLES + 1)) / 2;
+const START_ANGLE: number = -(Math.PI / 2);
 const BASE_ANGLE_INCREMENT: number = Math.PI / 180;
 const NUMBER_OF_SEGMENTS: number = 180;
 const ANGLE_INCREMENT_FACTOR: number = 360 / NUMBER_OF_SEGMENTS;
@@ -28,7 +29,7 @@ class Circle {
     public readonly radius: number;
     public readonly angleIncrement: number;
     public readonly hue: number;
-    public currentAngle: number = 0;
+    public currentAngle: number = START_ANGLE;
 
     public constructor(centerX: number, centerY: number, radius: number, angleIncrement: number, hue: number) {
         this.centerX = centerX;
@@ -48,7 +49,7 @@ class Circle {
 
     public render(): void {
         context.strokeStyle = `hsl(${this.hue}, 100%, 75%)`;
-        context.lineWidth = this.radius / 20;
+        context.lineWidth = this.radius / 10;
         context.beginPath();
         context.arc(this.centerX, this.centerY, this.radius, 0, Math.PI * 2);
         context.stroke();
@@ -102,7 +103,7 @@ class LissajousCurveTable {
             circle.render();
         }
         for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
-            context.lineWidth = CIRCLE_RADIUS / 20;
+            context.lineWidth = CIRCLE_RADIUS / 15;
             for (let j: number = 0; j < NUMBER_OF_CIRCLES; j += 1) {
                 const averageHue: number = (this.horizontalAxisCircles[j].hue + this.verticalAxisCircles[i].hue) / 2;
                 context.strokeStyle = `hsl(${averageHue}, 100%, 75%)`;
@@ -129,11 +130,12 @@ class LissajousCurveTable {
                 context.beginPath();
                 context.arc(
                     this.horizontalAxisCircles[j].pointX, this.verticalAxisCircles[i].pointY,
-                    CIRCLE_RADIUS / 20, 0, Math.PI * 2,
+                    CIRCLE_RADIUS / 15, 0, Math.PI * 2,
                 );
                 context.fill();
             }
             context.strokeStyle = "white";
+            context.globalAlpha = 0.75;
             context.lineWidth = 1;
             context.setLineDash([CIRCLE_RADIUS / 10, CIRCLE_RADIUS / 10]);
             context.beginPath();
@@ -145,6 +147,7 @@ class LissajousCurveTable {
             context.lineTo(TABLE_LENGTH, this.verticalAxisCircles[i].pointY);
             context.stroke();
             context.setLineDash([]);
+            context.globalAlpha = 1;
         }
     }
 
