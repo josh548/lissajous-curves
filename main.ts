@@ -1,22 +1,70 @@
-const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
-canvas.width = window.innerWidth / window.devicePixelRatio;
-canvas.height = window.innerHeight / window.devicePixelRatio;
+// tslint:disable-next-line:interface-name
+interface HTMLCanvasElementWithStream extends HTMLCanvasElement {
+    captureStream(): MediaStream;
+}
+
+declare class MediaRecorder {
+    public constructor(stream: MediaStream);
+    public ondataavailable(event: DataAvailableEvent): void;
+    public start(): void;
+    public stop(): void;
+}
+
+// tslint:disable-next-line:interface-name
+interface DataAvailableEvent extends Event {
+    data: Blob;
+}
+
+function handleDataAvailable(event: DataAvailableEvent): void {
+    if (event.data && event.data.size > 0) {
+        recordedBlobs.push(event.data);
+    }
+}
+
+function download(): void {
+    const blob: Blob = new Blob(recordedBlobs, { type: "video/webm" });
+    const url: string = window.URL.createObjectURL(blob);
+    const a: HTMLAnchorElement = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = "canvas.webm";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    // tslint:disable-next-line:align
+    }, 100);
+}
+
+const canvas: HTMLCanvasElementWithStream = document.querySelector("canvas") as HTMLCanvasElementWithStream;
+const innerSize: number = Math.min(window.innerWidth, window.innerHeight);
+canvas.width = innerSize;
+canvas.height = innerSize;
 
 const computedWidth: number = +getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
 const computedHeight: number = +getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
-canvas.setAttribute("width", `${computedWidth * window.devicePixelRatio}px`);
-canvas.setAttribute("height", `${computedHeight * window.devicePixelRatio}px`);
+const computedSize: number = Math.min(computedWidth, computedHeight);
+canvas.setAttribute("width", `${computedSize * window.devicePixelRatio}px`);
+canvas.setAttribute("height", `${computedSize * window.devicePixelRatio}px`);
 
 const TABLE_LENGTH: number = Math.min(canvas.width, canvas.height);
 const PADDING: number = TABLE_LENGTH / 50;
 const NUMBER_OF_CIRCLES: number = 5;
 const CIRCLE_RADIUS: number = ((TABLE_LENGTH - (PADDING * (NUMBER_OF_CIRCLES + 2))) / (NUMBER_OF_CIRCLES + 1)) / 2;
 const START_ANGLE: number = -(Math.PI / 2);
-const BASE_ANGLE_INCREMENT: number = Math.PI / 180;
+const BASE_ANGLE_INCREMENT: number = Math.PI / 90;
 const NUMBER_OF_SEGMENTS: number = 180;
 const ANGLE_INCREMENT_FACTOR: number = 360 / NUMBER_OF_SEGMENTS;
 
+let angleIncrementedSoFar: number = 0;
+
 const context: CanvasRenderingContext2D = canvas.getContext("2d")!;
+
+const mediaStream: MediaStream = canvas.captureStream();
+const recordedBlobs: Blob[] = [];
+const mediaRecorder: MediaRecorder = new MediaRecorder(mediaStream);
+mediaRecorder.ondataavailable = handleDataAvailable;
 
 interface Point {
     readonly x: number;
@@ -163,12 +211,19 @@ class LissajousCurveTable {
 
 const table: LissajousCurveTable = new LissajousCurveTable();
 
+mediaRecorder.start();
+
 function animate(): void {
     context.fillStyle = "hsl(0, 0%, 20%)";
     context.fillRect(0, 0, canvas.width, canvas.height);
     table.render();
     table.update();
-    requestAnimationFrame(animate);
+    angleIncrementedSoFar += BASE_ANGLE_INCREMENT;
+    if (angleIncrementedSoFar >= (Math.PI * 2.077)) {
+        mediaRecorder.stop();
+        setTimeout(download, 100);
+    }
+    window.requestAnimationFrame(animate);
 }
 
 animate();
