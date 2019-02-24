@@ -1,19 +1,24 @@
 {
     "defaultSeverity": "error",
     "extends": [
-        "tslint:all"
+        "tslint:recommended"
     ],
     "jsRules": {},
     "rules": {
         "interface-name": false,
         "max-classes-per-file": false,
-        "member-ordering": false,
-        "newline-per-chained-call": false,
-        "no-inferrable-types": false,
-        "no-magic-numbers": false,
-        "no-non-null-assertion": false,
-        "object-literal-sort-keys": false,
-        "only-arrow-functions": false
+        "typedef": [
+            true,
+            "call-signature",
+            "arrow-call-signature",
+            "parameter",
+            "arrow-parameter",
+            "property-declaration",
+            "variable-declaration",
+            "member-variable-declaration",
+            "object-destructuring",
+            "array-destructuring"
+        ]
     },
     "rulesDirectory": []
 }
