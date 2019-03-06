@@ -67,8 +67,6 @@ class LissajousCurveTable {
     public constructor() {
         for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
             this.circleHues.push((360 / NUMBER_OF_CIRCLES) * i);
-        }
-        for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
             this.horizontalAxisCircles.push(
                 new Circle(
                     ((i + 1) * (PADDING + (CIRCLE_RADIUS * 2))) + CIRCLE_RADIUS + PADDING,
@@ -91,11 +89,9 @@ class LissajousCurveTable {
     }
 
     public render(): void {
-        for (const circle of this.horizontalAxisCircles) {
-            circle.render();
-        }
-        for (const circle of this.verticalAxisCircles) {
-            circle.render();
+        for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
+            this.horizontalAxisCircles[i].render();
+            this.verticalAxisCircles[i].render();
         }
         for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
             context.lineWidth = CIRCLE_RADIUS / 15;
@@ -147,11 +143,9 @@ class LissajousCurveTable {
     }
 
     public update(): void {
-        for (const circle of this.horizontalAxisCircles) {
-            circle.update();
-        }
-        for (const circle of this.verticalAxisCircles) {
-            circle.update();
+        for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
+            this.horizontalAxisCircles[i].update();
+            this.verticalAxisCircles[i].update();
         }
     }
 }
