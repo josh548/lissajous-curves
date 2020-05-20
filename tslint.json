@@ -5,20 +5,7 @@
     ],
     "jsRules": {},
     "rules": {
-        "interface-name": false,
-        "max-classes-per-file": false,
-        "typedef": [
-            true,
-            "call-signature",
-            "arrow-call-signature",
-            "parameter",
-            "arrow-parameter",
-            "property-declaration",
-            "variable-declaration",
-            "member-variable-declaration",
-            "object-destructuring",
-            "array-destructuring"
-        ]
+        "max-classes-per-file": false
     },
     "rulesDirectory": []
 }

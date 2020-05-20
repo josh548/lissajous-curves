@@ -1,0 +1,25 @@
+{
+  "name": "lissajous-curves",
+  "version": "1.0.0",
+  "description": "Colorful demonstration of Lissajous Curves",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/escamilla/lissajous-curves.git"
+  },
+  "author": "Joshua Escamilla <joshua.escamilla@selu.edu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/escamilla/lissajous-curves/issues"
+  },
+  "homepage": "https://github.com/escamilla/lissajous-curves#readme",
+  "devDependencies": {
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.3"
+  }
+}
