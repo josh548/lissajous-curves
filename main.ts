@@ -1,22 +1,19 @@
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
 canvas.width = Math.floor(window.innerWidth * window.devicePixelRatio);
 canvas.height = Math.floor(window.innerHeight * window.devicePixelRatio);
 
 const TABLE_LENGTH: number = Math.min(canvas.width, canvas.height);
 const PADDING: number = TABLE_LENGTH / 50;
-const NUMBER_OF_CIRCLES: number = 5;
+const NUMBER_OF_CIRCLES = 5;
 const CIRCLE_RADIUS: number = ((TABLE_LENGTH - (PADDING * (NUMBER_OF_CIRCLES + 2))) / (NUMBER_OF_CIRCLES + 1)) / 2;
 const START_ANGLE: number = -(Math.PI / 2);
 const BASE_ANGLE_INCREMENT: number = Math.PI / 180;
-const NUMBER_OF_SEGMENTS: number = 180;
+const NUMBER_OF_SEGMENTS = 180;
 const ANGLE_INCREMENT_FACTOR: number = 360 / NUMBER_OF_SEGMENTS;
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const context: CanvasRenderingContext2D = canvas.getContext("2d")!;
-
-interface Point {
-    readonly x: number;
-    readonly y: number;
-}
 
 class Circle {
     public readonly centerX: number;
@@ -65,7 +62,7 @@ class LissajousCurveTable {
     private readonly circleHues: number[] = [];
 
     public constructor() {
-        for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
+        for (let i = 0; i < NUMBER_OF_CIRCLES; i += 1) {
             this.circleHues.push((360 / NUMBER_OF_CIRCLES) * i);
             this.horizontalAxisCircles.push(
                 new Circle(
@@ -89,13 +86,13 @@ class LissajousCurveTable {
     }
 
     public render(): void {
-        for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
+        for (let i = 0; i < NUMBER_OF_CIRCLES; i += 1) {
             this.horizontalAxisCircles[i].render();
             this.verticalAxisCircles[i].render();
         }
-        for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
+        for (let i = 0; i < NUMBER_OF_CIRCLES; i += 1) {
             context.lineWidth = CIRCLE_RADIUS / 15;
-            for (let j: number = 0; j < NUMBER_OF_CIRCLES; j += 1) {
+            for (let j = 0; j < NUMBER_OF_CIRCLES; j += 1) {
                 const averageHue: number = (this.horizontalAxisCircles[j].hue + this.verticalAxisCircles[i].hue) / 2;
                 context.strokeStyle = `hsl(${averageHue}, 100%, 75%)`;
                 const horizontalAxisCircle: Circle = this.horizontalAxisCircles[j];
@@ -143,7 +140,7 @@ class LissajousCurveTable {
     }
 
     public update(): void {
-        for (let i: number = 0; i < NUMBER_OF_CIRCLES; i += 1) {
+        for (let i = 0; i < NUMBER_OF_CIRCLES; i += 1) {
             this.horizontalAxisCircles[i].update();
             this.verticalAxisCircles[i].update();
         }
